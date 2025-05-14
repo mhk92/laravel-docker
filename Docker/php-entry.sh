@@ -1,4 +1,4 @@
-#!/bim/sh
+#!/bin/sh
 
 # composer update --no-progress --with-all-dependencies --optize-autoloader
 
@@ -8,13 +8,13 @@ if [ ! -file .env ]; then
     cp .env.example .env
 fi
 
-echo "Checking mysql service for connection..."
+#echo "Checking mysql service for connection..."
 
-until nc -z mysql 3306
-do
-    echo "Waiting for mysql service for connection"
-    sleep 5
-done
+#until nc -z mysql 3306
+#do
+ #   echo "Waiting for mysql service for connection"
+ #  sleep 5
+#done
 
 echo "Connected to mysql service..."
 php artisan migrate

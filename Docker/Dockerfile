@@ -19,3 +19,30 @@ COPY --from=composer:2.8.8 /usr/bin/composer /usr/bin/composer
 
 EXPOSE 9000
 ENTRYPOINT ["/var/www/html/Docker/php-entry.sh"]
+
+# NGINX
+FROM nginx:stable-alpine-perl AS nginx
+RUN apk update
+RUN mkdir -p /var/www/html
+WORKDIR /var/www/html
+COPY ./public ./public
+COPY ./Docker/nginx.conf /etc/nginx/conf.d/default.conf
+RUN chmod 755 ./public
+CMD ["nginx", "-g", "daemon off;"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

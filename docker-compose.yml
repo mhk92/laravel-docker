@@ -15,6 +15,7 @@ services:
             mysql:
               condition: service_healthy
     nginx:
+
         container_name: nginx
         build:
             context: .
@@ -33,6 +34,31 @@ services:
             - 80:80
         depends_on:
             - php
+            - node
+    node:
+        container_name: node
+        build:
+            context: .
+            dockerfile: ./Docker/Dockerfile
+            target: node
+        volumes:
+            - type: bind
+              source: ./resources
+              target: /var/www/html/resources
+        develop:
+            watch:
+                - action: rebuild
+                  path: ./package.json
+                  target: /var/www/html/package.json
+                - action: rebuild
+                  path: ./package-lock.json
+                  target: /var/www/html/package-lock.json
+                - action: rebuild
+                  path: ./vite.config.js
+                  target: /var/www/html/vite.config.js
+                - action: rebuild
+                  path: ./node_modules
+                  target: /var/www/html/node_modules
     mysql:
         container_name: mysql
         image: mysql:8.0.42-debian

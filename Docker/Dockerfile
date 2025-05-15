@@ -6,6 +6,8 @@ RUN docker-php-ext-install pdo pdo_mysql bcmath
 
 WORKDIR /var/www/html
 COPY . .
+RUN if [ $(id -u www-data) -ne 1000 ]; then usermod --uid 1000 www-data; fi
+RUN if [ $(id -g www-data) -ne 1000 ]; then groupmod --gid 1000 www-data; fi
 #COPY ./Docker/php-entry.sh ./Docker/php-entry.sh
 RUN chown -R www-data:www-data ./storage
 RUN chown -R www-data:www-data ./bootstrap/cache
@@ -30,10 +32,26 @@ COPY ./Docker/nginx.conf /etc/nginx/conf.d/default.conf
 RUN chmod 755 ./public
 CMD ["nginx", "-g", "daemon off;"]
 
+# node
+FROM node:lts-slim AS node
 
+RUN apt update -y
+RUN mkdir -p /var/www/html
 
+WORKDIR /var/www/html
 
+COPY --chown=node:node ./package-lock.json ./
+COPY --chown=node:node ./package.json ./
+COPY --chown=node:node ./vite.config.js ./
+COPY --chown=node:node ./public ./public
+COPY --chown=node:node ./resources ./resources
+COPY ./Docker/node-entry.sh ./node-entry.sh
+RUN npm install
+RUN chown -R node:node ./node_modules
 
+EXPOSE 5173
+CMD ["npm", "run", "dev"]
+ENTRYPOINT ["/var/www/html/node-entry.sh"]
 
 
 
